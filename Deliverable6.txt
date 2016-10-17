@@ -1,0 +1,2 @@
+The module decoder1to32 sets one bit of the output to be one when enable is 1. The bit is depending on the address. 
+“enable<<address”  shifts the one bit enable leftwards by the value of address.
