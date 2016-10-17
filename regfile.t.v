@@ -2,6 +2,8 @@
 // Test harness validates hw4testbench by connecting it to various functional 
 // or broken register files, and verifying that it correctly identifies each
 //------------------------------------------------------------------------------
+`include "regfile.v"
+
 
 module hw4testbenchharness();
 
@@ -138,6 +140,73 @@ output reg		Clk
     $display("Test Case 2 Failed");
   end
 
+  // Test Case 3: 
+  // Write Enable is broken
+  // set RegWrite to 0
+  // write 10 to register 3
+  // verify by reading from Read port 1 and 2
+  WriteRegister = 5'd3;
+  WriteData = 32'd10;
+  RegWrite = 0;
+  ReadRegister1 = 5'd3;
+  ReadRegister2 = 5'd3;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 10) || (ReadData2 == 10)) begin
+    dutpassed = 0;
+    $display("Test Case 3 Failed");
+  end
+
+  // Test Case 4: 
+  // Decoder is broken
+  // Write '1357' to register 4
+  // Verify that '1357' is not storeed with Read port 5 and 6
+  //   (Fails with example register file, but should pass with yours)
+  WriteRegister = 5'd4;
+  WriteData = 32'd1357;
+  RegWrite = 1;
+  ReadRegister1 = 5'd5;
+  ReadRegister2 = 5'd6;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 1357) || (ReadData2 == 1357)) begin
+    dutpassed = 0;
+    $display("Test Case 4 Failed");
+  end
+
+  // Test Case 5: 
+  // Register Zero is actually a register instead of the constant value zero
+  // Write 48 to register 0
+  WriteRegister = 5'd0;
+  WriteData = 32'd48;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if((ReadData1 == 48) || (ReadData2 == 48)) begin
+    dutpassed = 0;
+    $display("Test Case 5 Failed");
+  end
+
+  // Test Case 6: 
+  // Port 2 is broken and always read register 17
+  // Write 2 to register 2 and write 17 to register 17
+  WriteRegister = 5'd2;
+  WriteData = 32'd2;
+  RegWrite = 1;
+  #5 Clk=1; #5 Clk=0;
+  WriteRegister = 5'd17;
+  WriteData = 32'd17;
+  RegWrite = 1;
+  ReadRegister1 = 5'd0;
+  ReadRegister2 = 5'd0;
+  #5 Clk=1; #5 Clk=0;
+
+  if(ReadData1 == 17) begin
+    dutpassed = 0;
+    $display("Test Case 6 Failed");
+  end
 
   // All done!  Wait a moment and signal test completion.
   #5
